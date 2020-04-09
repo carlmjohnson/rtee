@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -8,7 +9,7 @@ import (
 	"os/exec"
 
 	"github.com/carlmjohnson/flagext"
-	"github.com/peterbourgon/ff"
+	"github.com/peterbourgon/ff/v3"
 )
 
 const AppName = "rtee"
@@ -19,7 +20,7 @@ func CLI(args []string) error {
 	if err == nil {
 		err = app.Exec()
 	}
-	if err != nil {
+	if err != nil && !errors.Is(err, flag.ErrHelp) {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 	}
 	return err
@@ -32,7 +33,10 @@ func (app *appEnv) ParseArgs(args []string) error {
 	fl.Var(dst, "dst", "secondary output file or URL")
 	fl.Usage = func() {
 		fmt.Fprintf(fl.Output(),
-			`rtee - Like tee but with automatic process substitution.`,
+			`rtee - Like tee but with automatic process substitution.
+
+	Options:
+`,
 		)
 		fl.PrintDefaults()
 		fmt.Fprintln(fl.Output(), "")

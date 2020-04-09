@@ -2,6 +2,42 @@
 
 Like tee but with automatic process substitution.
 
+## Screenshots
+```
+$ rtee -h
+rtee - Like tee but with automatic process substitution.
+
+        Options:
+  -dst value
+        secondary output file or URL (default stdout)
+
+$ ls | rtee pbcopy
+LICENSE
+README.md
+app
+go.mod
+go.sum
+main.go
+
+$ pbpaste
+LICENSE
+README.md
+app
+go.mod
+go.sum
+main.go
+
+$ ls | rtee -dst output.txt pbcopy
+
+$ cat output.txt
+LICENSE
+README.md
+app
+go.mod
+go.sum
+main.go
+```
+
 ## Installation
 
 First install [Go](http://golang.org).
@@ -14,4 +50,4 @@ GOBIN="$(pwd)" GOPATH="$(mktemp -d)" go get github.com/carlmjohnson/rtee
 
 ## TODO
 
-- [ ] Option to run output through shell
+- [ ] Option to run arguments through shell
