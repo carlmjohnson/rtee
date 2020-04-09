@@ -51,3 +51,4 @@ GOBIN="$(pwd)" GOPATH="$(mktemp -d)" go get github.com/carlmjohnson/rtee
 ## TODO
 
 - [ ] Option to run arguments through shell
+- [ ] Multiple destinations
