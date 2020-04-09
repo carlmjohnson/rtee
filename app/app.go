@@ -4,14 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"os"
+	"os/exec"
 
 	"github.com/carlmjohnson/flagext"
 	"github.com/peterbourgon/ff"
 )
 
-const AppName = "go-cli"
+const AppName = "rtee"
 
 func CLI(args []string) error {
 	var app appEnv
@@ -27,51 +27,33 @@ func CLI(args []string) error {
 
 func (app *appEnv) ParseArgs(args []string) error {
 	fl := flag.NewFlagSet(AppName, flag.ContinueOnError)
-	src := flagext.FileOrURL(flagext.StdIO, nil)
-	app.src = src
-	fl.Var(src, "src", "source file or URL")
-	app.Logger = log.New(nil, AppName+" ", log.LstdFlags)
-	fl.Var(
-		flagext.Logger(app.Logger, flagext.LogVerbose),
-		"verbose",
-		`log debug output`,
-	)
-
+	dst := flagext.FileWriter(flagext.StdIO)
+	app.dst = dst
+	fl.Var(dst, "dst", "secondary output file or URL")
 	fl.Usage = func() {
-		fmt.Fprintf(fl.Output(), `go-cli - a Go CLI application template cat clone
-
-Usage:
-
-	go-cli [options]
-
-Options:
-`)
+		fmt.Fprintf(fl.Output(),
+			`rtee - Like tee but with automatic process substitution.`,
+		)
 		fl.PrintDefaults()
 		fmt.Fprintln(fl.Output(), "")
 	}
-	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("GO_CLI")); err != nil {
+	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("RTEE")); err != nil {
 		return err
 	}
-	return nil
+	app.args = fl.Args()
+
+	return flagext.MustHaveArgs(fl, 1, -1)
 }
 
 type appEnv struct {
-	src io.ReadCloser
-	*log.Logger
+	dst  io.Writer
+	args []string
 }
 
 func (app *appEnv) Exec() (err error) {
-	app.Println("starting")
-	defer func() { app.Println("done") }()
-
-	n, err := io.Copy(os.Stdout, app.src)
-	defer func() {
-		e2 := app.src.Close()
-		if err == nil {
-			err = e2
-		}
-	}()
-	app.Printf("copied %d bytes\n", n)
-
-	return err
+	stdin := io.TeeReader(os.Stdin, app.dst)
+	cmd := exec.Command(app.args[0], app.args[1:]...)
+	cmd.Stdin = stdin
+	cmd.Stdout = os.Stderr
+	return cmd.Run()
 }
