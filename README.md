@@ -1,4 +1,4 @@
-# $NAME [![GoDoc](https://godoc.org/github.com/carlmjohnson/rtee?status.svg)](https://godoc.org/github.com/carlmjohnson/rtee) [![Go Report Card](https://goreportcard.com/badge/github.com/carlmjohnson/rtee)](https://goreportcard.com/report/github.com/carlmjohnson/rtee)
+# Rtee [![GoDoc](https://godoc.org/github.com/carlmjohnson/rtee?status.svg)](https://godoc.org/github.com/carlmjohnson/rtee) [![Go Report Card](https://goreportcard.com/badge/github.com/carlmjohnson/rtee)](https://goreportcard.com/report/github.com/carlmjohnson/rtee)
 
 Like tee but with automatic process substitution.
 
